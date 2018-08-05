@@ -1,0 +1,66 @@
+{% extends 'base_layout.html' %}
+
+{% block content %}
+<div class="col-cm-6 col-sm-offset-2">
+    {% if user.is_authenticated %}
+    {% if instance.author_id == user.id %}
+    <nav>
+    <ul>
+      <li><h3><a href='/articles/{{instance.slug}}/edit/' class="highlight">Edit Blog</a></h3></li>
+      <li><h3><a href='/articles/{{instance.slug}}/delete/' class="highlight">Delete Blog</a></h3></li>
+    </ul>
+    </nav>
+    {% endif %}
+    {% endif %}
+</div>
+
+<div class="article-detail">
+    <div class="article">
+        <img src="{{ instance.thumb.url }}" />
+        <h2>{{ instance.title }}</h2>
+        <h3>Written by {{ instance.author.username }}</h3>
+        <p><i>{{ instance.body }}</i></p>
+        <br>
+        <p>{{ instance.date }}</p>
+    </div>
+</div>
+
+{% if user.is_authenticated %}
+<br>
+<br>
+<a class="highlight" href="{% url 'articles:add_comment_to_post' slug=instance.slug %}">Add comment</a>
+<br>
+<br>
+{% for comment in instance.comments.all %}
+    {% if user.is_authenticated or comment.approved_comment %}
+    <div class="comment">
+        <div class="date">
+          <img src='/prof.jpg' />
+          <strong>{{ comment.author }}</strong>
+          {{ comment.created_date }}
+        </div>
+        <p><i>{{ comment.text|linebreaks }}</i></p>
+    </div>
+    {% endif %}
+{% empty %}
+    <p>No comments here yet :(</p>
+{% endfor %}
+{% else %}
+<br>
+<h2>Login / Sign Up to comment</h2>
+<br>
+{% for comment in instance.comments.all %}
+    <div class="comment">
+        <div class="date">
+            <img src='/prof.jpg' />
+            <strong>{{ comment.author }}</strong>
+            {{ comment.created_date }}
+        </div>
+        <p><i>{{ comment.text|linebreaks }}</i></p>
+    </div>
+{% empty %}
+    <p>No comments here yet :(</p>
+{% endfor %}
+{% endif %}
+
+{% endblock %}
